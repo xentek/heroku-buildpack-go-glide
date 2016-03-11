@@ -4,7 +4,7 @@ set -e
 
 build=$(cd "$1/" && pwd)
 
-if (test -f "$build/glide.yaml" && "$build/glide.lock")
+if (test -f "$build/glide.yaml" && test -f "$build/glide.lock")
 then
   echo Go
 else
