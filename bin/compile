@@ -184,8 +184,10 @@ step "Running: glide install"
 glide install
 
 pkgs=$(grep -l -R --exclude-dir=vendor --exclude-dir=.git "func main" . | tr '\n' ' ')
-step "Running: go build ${FLAGS[@]} -v $pkgs"
-go build ${FLAGS[@]} -v $pkgs
+
+export GO15VENDOREXPERIMENT=1
+step "Running: go install ${FLAGS[@]} -v $pkgs"
+go install ${FLAGS[@]} -v $pkgs
 
 mkdir -p $build/.profile.d
 echo 'PATH=$PATH:$HOME/bin' > $build/.profile.d/go.sh
