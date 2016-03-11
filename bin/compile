@@ -156,6 +156,8 @@ fi
 GOBIN=$build/bin export GOBIN
 GOPATH="$build" export GOPATH
 PATH=$GOPATH/bin:$GOROOT/bin:$PATH export PATH
+warn $PATH
+warn $(which glide)
 cd $build
 step "Running: glide install"
 glide install
