@@ -67,6 +67,8 @@ arch=$(uname -m|tr A-Z a-z)
 if test $arch = x86_64
 then arch=amd64
 fi
+PATH=$buildpack/$plat/bin:$venv/bin:$PATH
+
 plat=$(uname|tr A-Z a-z)-$archive
 steptxt="----->"
 
