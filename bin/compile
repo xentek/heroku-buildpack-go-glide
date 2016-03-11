@@ -88,6 +88,24 @@ finished() {
     echo "done"
 }
 
+
+parse_yaml() {
+  local prefix=$2
+  local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+  sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
+    -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+  awk -F$fs '{
+  indent = length($1)/2;
+  vname[indent] = $2;
+  for (i in vname) {if (i > indent) {delete vname[i]}}
+    if (length($3) > 0) {
+      vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+      printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+    }
+  }'
+}
+eval $(parse_yaml glide.yaml "glide_")
+
 # Default to $SOURCE_VERSION environment variable
 GO_LINKER_VALUE=${SOURCE_VERSION}
 
@@ -154,16 +172,21 @@ then
 fi
 
 GOBIN=$build/bin export GOBIN
-GOPATH="$build" export GOPATH
-PATH=$GOPATH/bin:$GOROOT/bin:$PATH export PATH
-warn $PATH
-warn $(which glide)
-cd $build
+GOPATH=$build/.heroku/go export GOPATH
+PATH=$GOROOT/bin:$PATH
+
+p=$GOPATH/src/$glide_package
+mkdir -p $p
+cp -R $build/* $p
+cd $p
+
 step "Running: glide install"
 glide install
-pkgs=$(grep -l -R --exclude-dir=vendor --exclude-dir=.git "func main" $build | tr '\n' ' ')
+
+pkgs=$(grep -l -R --exclude-dir=vendor --exclude-dir=.git "func main" . | tr '\n' ' ')
 step "Running: go build ${FLAGS[@]} -v $pkgs"
 go build ${FLAGS[@]} -v $pkgs
+
 mkdir -p $build/.profile.d
 echo 'PATH=$PATH:$HOME/bin' > $build/.profile.d/go.sh
 cp $buildpack/vendor/concurrency.sh $build/.profile.d/
