@@ -179,6 +179,7 @@ p=$GOPATH/src/$glide_package
 mkdir -p $p
 cp -R $build/* $p
 cd $p
+GOPATH=$p:$GOPATH export GOPATH
 
 step "Running: glide install"
 glide install
