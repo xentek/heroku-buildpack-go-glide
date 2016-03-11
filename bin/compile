@@ -176,11 +176,13 @@ PATH=$GOROOT/bin:$PATH
 
 eval $(parse_yaml $build/glide.yaml "glide_")
 
-p=$GOPATH/src/$glide_package
+step "Preparing to install: $glide_package"
+p=$build/.heroku/go/src/$glide_package
 mkdir -p $p
 cp -R $build/* $p
 cd $p
-GOPATH=$p/vendor:$GOPATH export GOPATH
+
+warn $p
 
 step "Running: glide install"
 glide install
