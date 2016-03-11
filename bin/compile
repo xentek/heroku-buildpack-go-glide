@@ -104,7 +104,6 @@ parse_yaml() {
     }
   }'
 }
-eval $(parse_yaml glide.yaml "glide_")
 
 # Default to $SOURCE_VERSION environment variable
 GO_LINKER_VALUE=${SOURCE_VERSION}
@@ -174,6 +173,8 @@ fi
 GOBIN=$build/bin export GOBIN
 GOPATH=$build/.heroku/go export GOPATH
 PATH=$GOROOT/bin:$PATH
+
+eval $(parse_yaml $build/glide.yaml "glide_")
 
 p=$GOPATH/src/$glide_package
 mkdir -p $p
